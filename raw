@@ -246,11 +246,11 @@ local Dig = function()
     if GetChest() then
         VG.Tween(Player.Character.HumanoidRootPart, GetChest():FindFirstChildWhichIsA("BasePart"), 50, Vector3.new(0,0,2), true)
         ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigChest", GetChest():GetAttribute('Coord'))
-        wait(2)
+        wait(.1)
     else
         VG.Tween(Player.Character.HumanoidRootPart, GetBlock(), 50, Vector3.new(0,0,1), true)
         ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", GetBlock():GetAttribute('Coord'))
-        wait(.3)
+        wait(.1)
     end
 end
 local DigAura = function() -- just Dig() without tweening
@@ -475,7 +475,7 @@ do
     Toggle:OnChanged(function()
         Digaura = Options.DigSiteAura.Value
         spawn(function()
-            while wait(.2) and Digaura do
+            while wait(.1) and Digaura do
                 pcall(function()
                     DigAura()
                 end)
