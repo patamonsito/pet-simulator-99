@@ -253,12 +253,44 @@ local Dig = function()
         wait(.1)
     end
 end
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local previousPosition = humanoidRootPart.Position
+local timeAtPosition = 0
+local checkInterval = 1 -- Intervalo de tiempo en segundos para verificar la posición
+local threshold = 5 -- Tiempo en segundos para considerar que el jugador no se ha movido
+local isActive = false -- Variable para controlar el bucle
+local goCofres = false
 local DigAura = function() -- just Dig() without tweening
-    if GetChest() then
-        ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigChest", GetChest():GetAttribute('Coord'))
+
+while wait(checkInterval) do
+    local currentPosition = humanoidRootPart.Position
+    if (currentPosition - previousPosition).magnitude < 0.1 then 
+        timeAtPosition += checkInterval
+        if timeAtPosition >= threshold then
+            print('Jugador no se ha movido')
+	    goCofres = true
+        end
     else
-        ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", GetBlock():GetAttribute('Coord'))
+        -- Restablece el contador si el jugador se ha movido
+        timeAtPosition = 0
     end
+    previousPosition = currentPosition
+end
+
+
+	if goCofres == true then
+    		if GetChest() then
+        		ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigChest", GetChest():GetAttribute('Coord'))
+    		else
+        		ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", GetBlock():GetAttribute('Coord'))
+    		end
+	else
+		ReplicatedStorage:WaitForChild("Network"):WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", GetBlock():GetAttribute('Coord'))
+ 	end
 end
 
 local GetCoinInZone = function()
